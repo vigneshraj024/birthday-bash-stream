@@ -106,14 +106,10 @@ app.post('/api/pixverse/generate-video', async (req, res) => {
         // Generate unique Ai-trace-id (REQUIRED!)
         const traceId = `video-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-        // Simplified request with only required parameters
+        // Minimal request with only essential parameters
         const requestBody = {
             img_id: parseInt(img_id),
             prompt: prompt || 'Create a joyful birthday celebration video',
-            duration: 6,
-            quality: '540p',
-            model: 'v4.5',
-            aspect_ratio: '16:9',  // Ensure 16:9 widescreen format
         };
 
         console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
