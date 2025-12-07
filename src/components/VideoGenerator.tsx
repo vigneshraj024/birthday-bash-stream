@@ -236,7 +236,7 @@ export function VideoGenerator({ onVideoGenerated, className = '' }: VideoGenera
                             autoPlay
                             loop
                             muted
-                            className="w-full h-auto max-h-96"
+                            className="w-full h-auto max-h-[70vh] object-cover"
                         />
                     </div>
 

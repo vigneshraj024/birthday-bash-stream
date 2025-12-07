@@ -23,7 +23,7 @@ export const cartoons: CartoonCharacter[] = [
     {
         id: 'doremon',
         name: 'Doremon',
-        image: '/doraemon.png',
+        image: '/cartoons/doremon.png',
         description: 'Doremon cartoon friend',
     },
 ];

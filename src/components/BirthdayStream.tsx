@@ -47,12 +47,14 @@ export function BirthdayStream({ approvedKids, selectedDate, onDateSelect, showD
   // Generated video state
   const [showVideoGenerator, setShowVideoGenerator] = useState(false);
 
-  // Filter kids by selected date (MM-DD)
+  // Filter kids by selected date (MM-DD) AND only show those with generated videos
   const filteredKids = approvedKids
     .filter(kid => {
       const kidDate = format(new Date(kid.date_of_birth), "MM-dd");
       const selectedDateStr = format(selectedDate, "MM-dd");
-      return kidDate === selectedDateStr;
+      const hasGeneratedVideo = kid.generated_video_url && kid.generated_video_url.trim() !== '';
+      // Only show birthdays that match the date AND have a generated video
+      return kidDate === selectedDateStr && hasGeneratedVideo;
     })
     .slice(0, 25); // Limit to 25 per day
 
@@ -113,12 +115,14 @@ export function BirthdayStream({ approvedKids, selectedDate, onDateSelect, showD
     }
   }, [isMuted]);
 
-  // Calculate kid counts per day for tabs
-  const kidCounts = approvedKids.reduce((acc, kid) => {
-    const dateKey = format(new Date(kid.date_of_birth), "MM-dd");
-    acc[dateKey] = (acc[dateKey] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // Calculate kid counts per day for tabs - only count those with generated videos
+  const kidCounts = approvedKids
+    .filter(kid => kid.generated_video_url && kid.generated_video_url.trim() !== '')
+    .reduce((acc, kid) => {
+      const dateKey = format(new Date(kid.date_of_birth), "MM-dd");
+      acc[dateKey] = (acc[dateKey] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
   // Auto-advance slides
   useEffect(() => {
@@ -246,11 +250,13 @@ export function BirthdayStream({ approvedKids, selectedDate, onDateSelect, showD
   );
 }
 
-// Export kid counts calculation for parent use
-export function calculateKidCounts(approvedKids: { date_of_birth: string }[]) {
-  return approvedKids.reduce((acc, kid) => {
-    const dateKey = format(new Date(kid.date_of_birth), "MM-dd");
-    acc[dateKey] = (acc[dateKey] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+// Export kid counts calculation for parent use - only count those with generated videos
+export function calculateKidCounts(approvedKids: { date_of_birth: string; generated_video_url?: string }[]) {
+  return approvedKids
+    .filter(kid => kid.generated_video_url && kid.generated_video_url.trim() !== '')
+    .reduce((acc, kid) => {
+      const dateKey = format(new Date(kid.date_of_birth), "MM-dd");
+      acc[dateKey] = (acc[dateKey] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 }

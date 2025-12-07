@@ -96,6 +96,7 @@ export function SubmissionForm({ onSuccess }: SubmissionFormProps) {
           null, // No cartoon image - AI generates from prompt
           data.kidName,
           cartoonName,
+          data.dateOfBirth, // include date text to show in video
           (progress) => setVideoProgress(progress)
         );
 

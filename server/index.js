@@ -100,7 +100,7 @@ app.post('/api/pixverse/generate-video', async (req, res) => {
         const requestBody = {
             img_id: parseInt(img_id),
             prompt: prompt || 'Create a joyful birthday celebration video',
-            duration: 5,
+            duration: 6,
             quality: '540p',
             model: 'v4.5',
             aspect_ratio: '16:9',  // Ensure 16:9 widescreen format

@@ -107,8 +107,34 @@ export function BirthdayCard({ kid, isActive = true, index = 0 }: BirthdayCardPr
             loop
             muted
             playsInline
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
           />
+
+          {/* Name and Date Overlay */}
+          <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 sm:gap-3">
+            {/* Name */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-center"
+            >
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-bold text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] mb-1">
+                {kid.kid_name}
+              </h1>
+            </motion.div>
+
+            {/* Date */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex items-center gap-2 text-base sm:text-lg md:text-xl font-medium text-white/95 bg-black/60 px-4 py-2 rounded-xl backdrop-blur-md border border-white/20"
+            >
+              <Cake className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+              <span className="drop-shadow-md">{formattedDate}</span>
+            </motion.div>
+          </div>
         </div>
       ) : (
         <>

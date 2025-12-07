@@ -4,9 +4,7 @@
 import type { PixverseGenerateResponse, PixverseStatusResponse } from '@/types/pixverse';
 import { createCompositeImage } from '@/utils/compositeImage';
 
-// Use environment variable for backend URL, fallback to localhost in development
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-
+const BACKEND_URL = 'http://localhost:3001';
 
 /**
  * Upload image via backend proxy
@@ -191,95 +189,50 @@ export async function generateBirthdayVideoWithCartoon(
     cartoonImageBase64: string | null,
     personName: string,
     cartoonName: string,
+    dateText: string | null,
     onProgress?: (progress: number) => void
 ): Promise<string> {
-    // Character-specific descriptions for accurate rendering
-    const characterDescriptions: { [key: string]: string } = {
-        'Shinchan': `Shinchan (Shinnosuke Nohara), the iconic 5-year-old Japanese anime character with these EXACT features:
-- VERY THICK, BOLD BLACK EYEBROWS (his most distinctive feature)
-- Small beady black eyes
-- Simple round head with minimal facial details
-- Wearing his signature RED SHORT-SLEEVED SHIRT and YELLOW SHORTS
-- Chibi-style proportions (large head, small body)
-- Mischievous, cheeky expression with a wide grin
-- Simple cartoon style typical of Japanese anime
-- NO realistic features, pure cartoon/anime style`,
+    let prompt = '';
 
-        'Doraemon': `Doraemon, the blue robotic cat with:
-- Round blue body with white face and belly
-- Large round eyes with black pupils
-- Red nose and white whiskers
-- No ears (distinctive feature)
-- Red collar with golden bell
-- White hands with no fingers (round mittens)
-- Cheerful, friendly expression`,
+    // Conditional Prompts based on Character
 
-        'Motu Patlu': `Motu and Patlu duo:
-- Motu: chubby character in orange outfit, always smiling
-- Patlu: thin character in yellow outfit with glasses
-- Both in simple Indian cartoon style`,
+    const dateLine = dateText ? ` and include a smaller caption showing the date: "${dateText}"` : '';
 
-        'Little Krishna': `Little Krishna (Bal Krishna):
-- Young boy with blue skin
-- Peacock feather in hair
-- Yellow dhoti (traditional Indian garment)
-- Flute in hand
-- Playful, divine appearance`,
+    if (cartoonName.toLowerCase().includes('doremon') || cartoonName.toLowerCase().includes('doraemon')) {
+        // Doraemon-specific prompt: Doraemon left + static real person centered behind cake
+        prompt = `Create a high-quality 6-second MP4 (H.264) 16:9 birthday celebration animation.
 
-        'Chotta Bheem': `Chotta Bheem:
-- Young Indian boy with brown skin
-- Orange dhoti
-- Strong, muscular build for a child
-- Confident, heroic expression
-- Black hair`,
+Use the uploaded Doraemon cartoon image as the animated Doraemon on the LEFT side of the frame. Doraemon should CLAP HANDS enthusiastically multiple times, display a BIG BRIGHT JOYFUL SMILE throughout, wave energetically, and do a small joyful jump/dance loop (playful, bouncy animation). The hand clapping should be prominent and repeated throughout the video with clear hand movements.
 
-        'Rudra': `Rudra:
-- Young Indian superhero character
-- Dynamic action pose
-- Colorful costume with cape`
-    };
+Use the uploaded real person photo as a photo-style cutout placed CENTERED behind a large birthday cake. The real person must remain exactly as in the photo (no face changes, no animation) and should not move — remain static behind the cake.
 
-    // Get character-specific description or use generic
-    const characterDesc = characterDescriptions[cartoonName] || `${cartoonName} cartoon character in authentic style`;
+Scene elements: bright, colorful party background with balloons, falling confetti, streamers, and soft glowing party lights. The cake (center) has lit candles with subtle sparkles and a gentle flicker.
 
-    // Enhanced prompt with character-specific details
-    const prompt = `Create a vibrant 6-second birthday celebration video in 16:9.
+Effects: confetti falling around both characters, candle flame sparkles, and small celebratory particle effects near Doraemon. Keep the person unanimated and photorealistic.
 
-MAIN FOCUS - Animate the Real Person:
-The uploaded real person is the STAR celebrating their birthday. Animate them:
-- Waving, smiling, clapping with joy
-- Natural happy celebratory movements
-- Keep face photorealistic but add celebration animation
-- Positioned prominently in center-right
+    Text: prominently display animated party-style text: "🎉 Happy Birthday ${personName}! 🎉" integrated into the background with playful entrance animation${dateLine}. The birthday name and date should remain visible continuously throughout the entire 6 seconds (no breaks).
 
-Supporting - ${cartoonName} Cartoon Character:
-On the LEFT side, add ${characterDesc}
-The character should be:
-- Celebrating enthusiastically, waving and dancing happily
-- In AUTHENTIC cartoon/anime style (NOT realistic)
-- Clearly recognizable with all distinctive features
-- Animated with joyful movements
+Camera: smooth slow zoom-in with a light sideways pan for cinematic motion.
 
-Scene & Background:
-- Festive party background with colorful balloons, confetti, streamers, and party lights
-- Birthday cake with flickering candles in the foreground
-- IMPORTANT: Display large, prominent text in the BACKGROUND: "HAPPY BIRTHDAY ${personName.toUpperCase()}"
-- The text should be:
-  * Positioned on the back wall/background behind the person
-  * Large, bold, colorful letters (gold, rainbow, or neon style)
-  * Clearly visible and readable
-  * Part of the party decoration on the wall
-  * With festive styling (balloons, stars, sparkles around it)
+Style: blend soft cel-shaded Doraemon animation with a real-photo cutout; Doraemon should be lively and cartoony with an extra cheerful expression while the person remains unchanged. 24–30 FPS, duration 6s, output MP4 H.264, aspect ratio 16:9. Produce two slight variations (neutral and warmer color grade).`;
+    } else {
+        // Default placeholder prompt for other cartoons (kept minimal)
+        prompt = `Create a joyful 6-second 16:9 birthday animation featuring the selected cartoon and the uploaded person. The cartoon character should CLAP HANDS enthusiastically and display a BIG BRIGHT SMILE throughout the video. Place the cartoon on the LEFT and the real person centered behind a cake; keep the person static. Add confetti, balloons, candles, and display 'Happy Birthday ${personName}!'. Duration 6s.`;
+    }
 
-Camera: Smooth gentle zoom-in
-Effects: Confetti falling, soft glowing lights, colorful particles
-Additional text overlay: "🎉" emojis and celebration effects
+    // If a cartoon image is provided, create a composite (cartoon + person) so proxy receives a single image.
+    // If no cartoon image is provided, upload the person image alone and let the generator create Doraemon from the prompt.
+    let targetImageBase64 = personImageBase64;
+    if (cartoonImageBase64) {
+        try {
+            targetImageBase64 = await createCompositeImage(cartoonImageBase64, personImageBase64);
+        } catch (err) {
+            console.warn('Failed to create composite image, falling back to person image only', err);
+            targetImageBase64 = personImageBase64;
+        }
+    }
 
-Style: Fun, lively celebration. Real person should feel alive and celebrating, not static. Cartoon character must be in pure cartoon/anime style. 6 seconds, 16:9, 24-30 FPS.`;
-
-
-    // Use ONLY person image - AI will generate cartoon from prompt
-    const response = await generateVideoFromImage(personImageBase64, prompt, 6);
+    const response = await generateVideoFromImage(targetImageBase64, prompt, 6);
 
     if (!response.id) {
         throw new Error('No video ID returned from API');

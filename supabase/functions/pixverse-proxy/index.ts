@@ -1,10 +1,9 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from 'std/http/server.ts'
 
 const PIXVERSE_API_KEY = Deno.env.get('PIXVERSE_API_KEY')
 const PIXVERSE_BASE_URL = 'https://api.pixverse.ai/v1'
 
-serve(async (req) => {
+serve(async (req: Request) => {
     // Handle CORS
     if (req.method === 'OPTIONS') {
         return new Response('ok', {
@@ -73,7 +72,8 @@ serve(async (req) => {
         })
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
+        return new Response(JSON.stringify({ error: errorMessage }), {
             status: 500,
             headers: {
                 'Content-Type': 'application/json',
