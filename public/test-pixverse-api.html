@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixverse API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Pixverse API Key Test</h1>
+        <p>This will test if your Pixverse API key is valid by making a simple API call.</p>
+        
+        <button onclick="testAPI()">Test API Key</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_KEY = 'sk-8755922f136b65fcdb09d6f2eaee0572';
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '🔄 Testing API key...';
+            
+            try {
+                // Test 1: Try to upload a simple test image
+                resultDiv.innerHTML += '\n\n📤 Step 1: Testing image upload...';
+                
+                // Create a simple 1x1 pixel image in base64
+                const testImage = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+                
+                const uploadResponse = await fetch('https://app-api.pixverse.ai/openapi/v2/img/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'API-KEY': API_KEY,
+                    },
+                    body: JSON.stringify({
+                        image: testImage,
+                    }),
+                });
+                
+                const uploadData = await uploadResponse.json();
+                
+                resultDiv.innerHTML += '\n\n📊 Upload Response:';
+                resultDiv.innerHTML += '\n' + JSON.stringify(uploadData, null, 2);
+                
+                if (uploadData.ErrCode === 0) {
+                    resultDiv.innerHTML += '\n\n<span class="success">✅ SUCCESS! Your API key is valid!</span>';
+                    resultDiv.innerHTML += '\n<span class="success">✅ Image uploaded successfully!</span>';
+                    resultDiv.innerHTML += '\n<span class="success">✅ Got img_id: ' + uploadData.Resp.img_id + '</span>';
+                } else {
+                    resultDiv.innerHTML += '\n\n<span class="error">❌ API Error: ' + uploadData.ErrMsg + '</span>';
+                    resultDiv.innerHTML += '\n<span class="error">Error Code: ' + uploadData.ErrCode + '</span>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += '\n\n<span class="error">❌ Network Error:</span>';
+                resultDiv.innerHTML += '\n<span class="error">' + error.message + '</span>';
+                resultDiv.innerHTML += '\n\n<span class="error">Possible issues:</span>';
+                resultDiv.innerHTML += '\n<span class="error">1. API key is invalid</span>';
+                resultDiv.innerHTML += '\n<span class="error">2. Network/CORS issue</span>';
+                resultDiv.innerHTML += '\n<span class="error">3. Pixverse API is down</span>';
+            }
+        }
+    </script>
+</body>
+</html>
