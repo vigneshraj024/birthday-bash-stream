@@ -110,6 +110,7 @@ app.post('/api/pixverse/generate-video', async (req, res) => {
         const requestBody = {
             img_id: parseInt(img_id),
             prompt: prompt || 'Create a joyful birthday celebration video',
+            seed: Math.floor(Math.random() * 2147483647) + 1, // Random seed (1 to 2147483647)
         };
 
         console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
