@@ -11,13 +11,30 @@ const PORT = process.env.PORT || 3001;
 const PIXVERSE_API_KEY = process.env.PIXVERSE_API_KEY;
 
 // Middleware - CORS configuration
+// Middleware - CORS configuration
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:8080'
+];
+
+// Add production frontend URL if defined
+if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-    origin: [
-        'https://birthday-bash-frontend.onrender.com',
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'http://localhost:8080'
-    ],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+            callback(null, true);
+        } else {
+            console.log('Blocked by CORS:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'API-KEY', 'Ai-trace-id'],
