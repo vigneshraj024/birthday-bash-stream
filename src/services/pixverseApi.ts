@@ -3,6 +3,7 @@
 
 import type { PixverseGenerateResponse, PixverseStatusResponse } from '@/types/pixverse';
 import { createCompositeImage } from '@/utils/compositeImage';
+import { addTextToImage } from '@/utils/addTextToImage';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
@@ -317,6 +318,15 @@ CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text in the background 
             console.warn('Failed to create composite image, falling back to person image only', err);
             targetImageBase64 = personImageBase64;
         }
+    }
+
+    // Add "Happy Birthday" text overlay to ensure it appears in the video
+    // AI models are unreliable at generating text from prompts, so we add it directly to the image
+    try {
+        targetImageBase64 = await addTextToImage(targetImageBase64, personName, dateText);
+        console.log('✅ Added birthday text overlay to image');
+    } catch (err) {
+        console.warn('Failed to add text overlay, proceeding without it', err);
     }
 
     const response = await generateVideoFromImage(targetImageBase64, prompt, 5);
