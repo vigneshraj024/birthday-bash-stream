@@ -213,7 +213,9 @@ Appearance: Classic blue body, white belly, red nose, red collar with bell. He s
 Action: Doraemon is JUMPING with joy, CLAPPING his hands, and WAVING energetically at the person to celebrate.
 
 Scene: Bright, colorful party background with balloons, falling confetti, and streamers.
-Text: In the BACKGROUND, behind the characters, display large colorful text: "Happy Birthday ${personName}! 🎉" ${dateLine}.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, HIGHLY VISIBLE text on the wall/background that reads: "Happy Birthday ${personName}!" The text MUST be clearly readable, use bright contrasting colors (rainbow gradient or gold), and be positioned prominently in the upper portion of the background. ${dateLine ? `Also include smaller text showing: "${dateText}"` : ''}
+
 Style: Blend soft cel-shaded animation with real-photo cutout. 24fps.`;
 
     } else if (lowerName.includes('little krishna') || lowerName.includes('krishna')) {
@@ -227,7 +229,9 @@ Appearance: LIGHT BLUE SKIN, yellow dhoti, peacock feather in hair, jewelry. Hol
 Action: Krishna is DANCING joyfully, playing his flute briefly, then stopping to CLAP and BLESS the person with a smile.
 
 Scene: Divine Vrindavan garden party with soft glowing lights and sparkles.
-Text: In the BACKGROUND, display glowing magical text: "Happy Birthday ${personName}! ✨" ${dateLine}.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, GLOWING, MAGICAL text floating in the sky/background that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with divine golden glow effect, large font size, and positioned prominently above or behind the characters. ${dateLine ? `Also include smaller glowing text: "${dateText}"` : ''}
+
 Style: High-quality 3D animated style, divine atmosphere.`;
 
     } else if (lowerName.includes('mottu') || lowerName.includes('motu')) {
@@ -241,7 +245,9 @@ Appearance: Motu (Fat, red tunic, blue sash, mustache) and Patlu (Thin, yellow t
 Action: Both Motu and Patlu are DANCING joyfully and CLAPPING their hands to celebrate. They are smiling and looking at the person.
 
 Scene: Vibrant town market background (Furfuri Nagar style) with party decorations.
-Text: In the BACKGROUND, behind the characters, display large colorful text: "Happy Birthday ${personName}! 🎉" ${dateLine}.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text on a banner or wall in the background that reads: "Happy Birthday ${personName}!" The text MUST be clearly readable, use vibrant multi-colored letters, large font, and be prominently visible in the scene. ${dateLine ? `Include smaller text banner: "${dateText}"` : ''}
+
 Style: High-quality 3D animation (CGI), bright colors.`;
 
     } else if (lowerName.includes('shinchan')) {
@@ -255,7 +261,9 @@ Appearance: Small boy, red t-shirt, yellow shorts, thick black eyebrows.
 Action: Shinchan is JUMPING excitedly and doing his signature "Action Kamen" pose to celebrate. He is laughing and waving.
 
 Scene: Colorful living room or park background with crayons/doodles style.
-Text: In the BACKGROUND on the wall, display bold cartoon font: "Happy Birthday ${personName}! 🎈" ${dateLine}.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, CARTOON-STYLE text written on the wall/background that reads: "Happy Birthday ${personName}!" The text MUST be in thick black outline with bright fill colors, very large and clearly visible, positioned prominently on the wall behind the scene. ${dateLine ? `Add smaller cartoon text: "${dateText}"` : ''}
+
 Style: 2D Anime style, flat colors, thick outlines.`;
 
     } else if (lowerName.includes('rudra')) {
@@ -269,7 +277,9 @@ Appearance: Young magical boy prince, red and gold outfit, spiky hair, holding a
 Action: Rudra casts a gentle magic spell with his wand, sending sparkles towards the birthday cake, then smiles and waves.
 
 Scene: Magical palace background with floating magic particles.
-Text: In the BACKGROUND, display glowing magical text: "Happy Birthday ${personName}! ✨" ${dateLine}.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, GLOWING, MAGICAL text floating in the air that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with bright magical glow, sparkle effects, large size, and positioned prominently in the upper background. ${dateLine ? `Include smaller magical text: "${dateText}"` : ''}
+
 Style: 3D CGI animation, glossy, magical effects.`;
 
     } else if (lowerName.includes('bheem')) {
@@ -283,7 +293,9 @@ Appearance: Strong kid, orange dhoti, no shirt, wristbands, tilak on forehead.
 Action: Bheem is standing heroically, giving a big THUMBS UP and WAVING his hand to wish happy birthday. He has a confident smile.
 
 Scene: Dholakpur village setting with festive banners.
-Text: In the BACKGROUND, display large orange/gold text: "Happy Birthday ${personName}! 🏆" ${dateLine}.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD text on a festive banner in the background that reads: "Happy Birthday ${personName}!" The text MUST be in bright orange/gold colors, very large font, clearly readable, and prominently displayed on banners or walls in the village scene. ${dateLine ? `Add smaller banner text: "${dateText}"` : ''}
+
 Style: 2D detailed animation, vibrant colors.`;
 
     } else {
@@ -291,7 +303,8 @@ Style: 2D detailed animation, vibrant colors.`;
         prompt = `Create a joyful 5-second 16:9 birthday animation featuring the selected cartoon and the uploaded person.
 Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake.
 On the LEFT side, animate the cartoon character CLAPPING HANDS and celebrating.
-Text: In the BACKGROUND, display large text: "Happy Birthday ${personName}!" ${dateLine}.`;
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text in the background that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible, use bright contrasting colors, large font size, and be prominently positioned in the upper background. ${dateLine ? `Include smaller text: "${dateText}"` : ''}`;
     }
 
     // If a cartoon image is provided, create a composite (cartoon + person) so proxy receives a single image.
