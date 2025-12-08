@@ -107,6 +107,8 @@ export function BirthdayCard({ kid, isActive = true, index = 0 }: BirthdayCardPr
             loop
             muted
             playsInline
+            preload="auto"
+            referrerPolicy="no-referrer"
             className="w-full h-full object-cover"
           />
 

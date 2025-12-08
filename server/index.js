@@ -15,21 +15,27 @@ app.use(cors({
     origin: [
         'https://birthday-bash-frontend.onrender.com',
         'http://localhost:5173',
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'http://localhost:8080'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    optionsSuccessStatus: 200 // For legacy browser support
+    allowedHeaders: ['Content-Type', 'Authorization', 'API-KEY', 'Ai-trace-id'],
+    optionsSuccessStatus: 200
 }));
+
+app.options('*', cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Health check
+// Health Check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'Pixverse proxy server is running' });
 });
 
-// Upload image to Pixverse using FormData
+
+// ---------------------------------------------------------------------------
+// 📤 1) UPLOAD IMAGE → Pixverse
+// ---------------------------------------------------------------------------
 app.post('/api/pixverse/upload-image', async (req, res) => {
     try {
         const { image } = req.body;
@@ -40,30 +46,32 @@ app.post('/api/pixverse/upload-image', async (req, res) => {
 
         console.log('📤 Uploading image to Pixverse...');
 
-        // Convert base64 to buffer
-        const base64Data = image.includes('base64,') ? image.split('base64,')[1] : image;
+        const base64Data = image.includes('base64,')
+            ? image.split('base64,')[1]
+            : image;
+
         const imageBuffer = Buffer.from(base64Data, 'base64');
 
-        // Create FormData
         const formData = new FormData();
         formData.append('image', imageBuffer, {
-            filename: 'birthday.jpg',
-            contentType: 'image/jpeg',
+            filename: 'upload.jpg',
+            contentType: 'image/jpeg'
         });
 
-        // Generate unique Ai-trace-id (REQUIRED!)
         const traceId = `upload-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-        // Upload using multipart/form-data
-        const response = await fetch('https://app-api.pixverse.ai/openapi/v2/image/upload', {
-            method: 'POST',
-            headers: {
-                'API-KEY': PIXVERSE_API_KEY,
-                'Ai-trace-id': traceId,
-                ...formData.getHeaders(),
-            },
-            body: formData,
-        });
+        const response = await fetch(
+            'https://app-api.pixverse.ai/openapi/v2/image/upload',
+            {
+                method: 'POST',
+                headers: {
+                    'API-KEY': PIXVERSE_API_KEY,
+                    'Ai-trace-id': traceId,
+                    ...formData.getHeaders(),
+                },
+                body: formData,
+            }
+        );
 
         const responseText = await response.text();
         console.log('📄 Upload response status:', response.status);
@@ -71,31 +79,32 @@ app.post('/api/pixverse/upload-image', async (req, res) => {
         let data;
         try {
             data = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('❌ Failed to parse response');
+        } catch {
             return res.status(500).json({
-                error: 'Pixverse API returned invalid response',
-                statusCode: response.status
+                error: 'Pixverse returned invalid JSON',
+                raw: responseText
             });
         }
-
-        console.log('✅ Image uploaded:', data);
 
         if (data.ErrCode !== 0) {
             return res.status(400).json({ error: data.ErrMsg || 'Upload failed' });
         }
 
         res.json(data);
+
     } catch (error) {
         console.error('❌ Upload error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Generate video from image
+
+// ---------------------------------------------------------------------------
+// 🎬 2) GENERATE VIDEO FROM IMAGE (MAIN ENDPOINT)
+// ---------------------------------------------------------------------------
 app.post('/api/pixverse/generate-video', async (req, res) => {
     try {
-        const { img_id, prompt } = req.body;
+        const { img_id, prompt, duration } = req.body;
 
         if (!img_id) {
             return res.status(400).json({ error: 'img_id is required' });
@@ -103,76 +112,99 @@ app.post('/api/pixverse/generate-video', async (req, res) => {
 
         console.log('🎬 Generating video with img_id:', img_id);
 
-        // Generate unique Ai-trace-id (REQUIRED!)
         const traceId = `video-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-        // Minimal request with only essential parameters
+        // ⭐ Correct PixVerse request body ⭐
         const requestBody = {
             img_id: parseInt(img_id),
             prompt: prompt || 'Create a joyful birthday celebration video',
-            seed: Math.floor(Math.random() * 2147483647) + 1, // Random seed (1 to 2147483647)
+            duration: parseInt(duration) || 5,  // INTEGER: 5 or 8 seconds only
+            aspect_ratio: "16:9",
+            model: "v3.5",  // REQUIRED: Debugging confirmed v3.5 works
+            quality: "540p", // REQUIRED: Default quality
+            motion_mode: "normal", // REQUIRED: Default motion
+            negative_prompt: "distortion, blurry, low quality" // Recommended default
         };
 
-        console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
+        console.log("📤 Request to PixVerse:", requestBody);
 
-        const response = await fetch('https://app-api.pixverse.ai/openapi/v2/video/img/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'API-KEY': PIXVERSE_API_KEY,
-                'Ai-trace-id': traceId,
-            },
-            body: JSON.stringify(requestBody),
-        });
+        const response = await fetch(
+            'https://app-api.pixverse.ai/openapi/v2/video/img/generate',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'API-KEY': PIXVERSE_API_KEY,
+                    'Ai-trace-id': traceId
+                },
+                body: JSON.stringify(requestBody)
+            }
+        );
 
         const data = await response.json();
-        console.log('✅ Video generation response:', data);
+        console.log("📽 Video generation result:", data);
 
         if (data.ErrCode !== 0) {
-            return res.status(400).json({ error: data.ErrMsg || 'Generation failed', details: data });
+            return res.status(400).json({
+                error: data.ErrMsg || 'Video generation failed',
+                raw: data
+            });
         }
 
         res.json(data);
+
     } catch (error) {
         console.error('❌ Generation error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Check video status
+
+// ---------------------------------------------------------------------------
+// 🔍 3) CHECK VIDEO STATUS
+// ---------------------------------------------------------------------------
 app.get('/api/pixverse/status/:videoId', async (req, res) => {
     try {
         const { videoId } = req.params;
 
-        console.log('🔍 Checking status for video:', videoId);
+        console.log('🔍 Checking video status:', videoId);
 
-        // Generate unique Ai-trace-id
         const traceId = `status-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-        const response = await fetch(`https://app-api.pixverse.ai/openapi/v2/video/result/${videoId}`, {
-            method: 'GET',
-            headers: {
-                'API-KEY': PIXVERSE_API_KEY,
-                'Ai-trace-id': traceId,
-            },
-        });
+        const response = await fetch(
+            `https://app-api.pixverse.ai/openapi/v2/video/result/${videoId}`,
+            {
+                method: 'GET',
+                headers: {
+                    'API-KEY': PIXVERSE_API_KEY,
+                    'Ai-trace-id': traceId
+                }
+            }
+        );
 
         const data = await response.json();
-        console.log('✅ Status response:', data);
+        console.log("📊 Status response:", data);
 
         if (data.ErrCode !== 0) {
-            return res.status(400).json({ error: data.ErrMsg || 'Status check failed' });
+            return res.status(400).json({
+                error: data.ErrMsg || 'Status check failed',
+                raw: data
+            });
         }
 
         res.json(data);
+
     } catch (error) {
         console.error('❌ Status check error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
+
+// ---------------------------------------------------------------------------
+// 🚀 START SERVER
+// ---------------------------------------------------------------------------
 app.listen(PORT, () => {
-    console.log(`🚀 Pixverse proxy server running on http://localhost:${PORT}`);
-    console.log(`📡 Ready to proxy requests to Pixverse API`);
-    console.log(`🔑 API Key: ${PIXVERSE_API_KEY ? 'YES' : 'NO'}`);
+    console.log(`🚀 Pixverse Proxy running on port ${PORT}`);
+    console.log(`🔑 API Key Loaded: ${PIXVERSE_API_KEY ? 'YES' : 'NO'}`);
 });

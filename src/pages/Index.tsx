@@ -47,24 +47,8 @@ const Index = () => {
         })) as ApprovedKid[];
       }
 
-      // Merge with local generated birthdays (for preview without DB migration)
-      try {
-        const localData = localStorage.getItem('local_generated_birthdays');
-        console.log("📦 Raw localStorage data:", localData);
+      // Local storage data loading removed to ensure only Supabase data is shown
 
-        const localBirthdays = JSON.parse(localData || '[]');
-        console.log("📥 Parsed local birthdays:", localBirthdays);
-
-        if (localBirthdays.length > 0) {
-          console.log("🔄 Merging local birthdays with Supabase data...");
-          // Add local ones at the beginning
-          kids = [...localBirthdays, ...kids];
-        } else {
-          console.log("⚠️ No local birthdays found in storage");
-        }
-      } catch (e) {
-        console.error("❌ Error loading local birthdays:", e);
-      }
 
       console.log("📋 Final approved kids list:", kids);
       setApprovedKids(kids);

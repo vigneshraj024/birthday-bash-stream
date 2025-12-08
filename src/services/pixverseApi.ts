@@ -48,7 +48,7 @@ async function uploadImage(imageBase64: string): Promise<number> {
 export async function generateVideoFromImage(
     imageBase64: string,
     prompt?: string,
-    duration = 4
+    duration = 5  // Pixverse API only supports 5 or 8 seconds
 ): Promise<PixverseGenerateResponse> {
     try {
         // Step 1: Upload image first
@@ -64,9 +64,11 @@ export async function generateVideoFromImage(
             body: JSON.stringify({
                 img_id: imgId,
                 prompt: prompt || 'Create a dynamic birthday celebration video with festive animations',
-                duration,
+                duration: 5
             }),
         });
+
+        console.log('video generator::', `${BACKEND_URL}/api/pixverse/generate-video`)
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -198,26 +200,98 @@ export async function generateBirthdayVideoWithCartoon(
 
     const dateLine = dateText ? ` and include a smaller caption showing the date: "${dateText}"` : '';
 
-    if (cartoonName.toLowerCase().includes('doremon') || cartoonName.toLowerCase().includes('doraemon')) {
-        // Doraemon-specific prompt: Doraemon left + static real person centered behind cake
-        prompt = `Create a high-quality 6-second MP4 (H.264) 16:9 birthday celebration animation.
+    const lowerName = cartoonName.toLowerCase();
 
-Use the uploaded Doraemon cartoon image as the animated Doraemon on the LEFT side of the frame. Doraemon should CLAP HANDS enthusiastically multiple times, display a BIG BRIGHT JOYFUL SMILE throughout, wave energetically, and do a small joyful jump/dance loop (playful, bouncy animation). The hand clapping should be prominent and repeated throughout the video with clear hand movements.
+    if (lowerName.includes('doremon') || lowerName.includes('doraemon')) {
+        // Doraemon
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
 
-Use the uploaded real person photo as a photo-style cutout placed CENTERED behind a large birthday cake. The real person must remain exactly as in the photo (no face changes, no animation) and should not move — remain static behind the cake.
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake (lit candles). The person must NOT change.
 
-Scene elements: bright, colorful party background with balloons, falling confetti, streamers, and soft glowing party lights. The cake (center) has lit candles with subtle sparkles and a gentle flicker.
+On the LEFT side, animate "Doraemon" (Blue robotic cat).
+Appearance: Classic blue body, white belly, red nose, red collar with bell. He should look happy and excited.
+Action: Doraemon is JUMPING with joy, CLAPPING his hands, and WAVING energetically at the person to celebrate.
 
-Effects: confetti falling around both characters, candle flame sparkles, and small celebratory particle effects near Doraemon. Keep the person unanimated and photorealistic.
+Scene: Bright, colorful party background with balloons, falling confetti, and streamers.
+Text: In the BACKGROUND, behind the characters, display large colorful text: "Happy Birthday ${personName}! 🎉" ${dateLine}.
+Style: Blend soft cel-shaded animation with real-photo cutout. 24fps.`;
 
-    Text: prominently display animated party-style text: "🎉 Happy Birthday ${personName}! 🎉" integrated into the background with playful entrance animation${dateLine}. The birthday name and date should remain visible continuously throughout the entire 6 seconds (no breaks).
+    } else if (lowerName.includes('little krishna') || lowerName.includes('krishna')) {
+        // Little Krishna
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
 
-Camera: smooth slow zoom-in with a light sideways pan for cinematic motion.
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake (lit candles). The person must NOT change.
 
-Style: blend soft cel-shaded Doraemon animation with a real-photo cutout; Doraemon should be lively and cartoony with an extra cheerful expression while the person remains unchanged. 24–30 FPS, duration 6s, output MP4 H.264, aspect ratio 16:9. Produce two slight variations (neutral and warmer color grade).`;
+On the LEFT side, animate "Little Krishna" (Lord Krishna as a child).
+Appearance: LIGHT BLUE SKIN, yellow dhoti, peacock feather in hair, jewelry. Holding a flute.
+Action: Krishna is DANCING joyfully, playing his flute briefly, then stopping to CLAP and BLESS the person with a smile.
+
+Scene: Divine Vrindavan garden party with soft glowing lights and sparkles.
+Text: In the BACKGROUND, display glowing magical text: "Happy Birthday ${personName}! ✨" ${dateLine}.
+Style: High-quality 3D animated style, divine atmosphere.`;
+
+    } else if (lowerName.includes('mottu') || lowerName.includes('motu')) {
+        // Motu Patlu
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
+
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake. The person must NOT change.
+
+On the LEFT side, animate "Motu and Patlu" (Indian cartoon duo).
+Appearance: Motu (Fat, red tunic, blue sash, mustache) and Patlu (Thin, yellow tunic, glasses).
+Action: Both Motu and Patlu are DANCING joyfully and CLAPPING their hands to celebrate. They are smiling and looking at the person.
+
+Scene: Vibrant town market background (Furfuri Nagar style) with party decorations.
+Text: In the BACKGROUND, behind the characters, display large colorful text: "Happy Birthday ${personName}! 🎉" ${dateLine}.
+Style: High-quality 3D animation (CGI), bright colors.`;
+
+    } else if (lowerName.includes('shinchan')) {
+        // Shinchan
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
+
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake. The person must NOT change.
+
+On the LEFT side, animate "Shinchan Nohara".
+Appearance: Small boy, red t-shirt, yellow shorts, thick black eyebrows.
+Action: Shinchan is JUMPING excitedly and doing his signature "Action Kamen" pose to celebrate. He is laughing and waving.
+
+Scene: Colorful living room or park background with crayons/doodles style.
+Text: In the BACKGROUND on the wall, display bold cartoon font: "Happy Birthday ${personName}! 🎈" ${dateLine}.
+Style: 2D Anime style, flat colors, thick outlines.`;
+
+    } else if (lowerName.includes('rudra')) {
+        // Rudra
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
+
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake. The person must NOT change.
+
+On the LEFT side, animate "Rudra" (Prince of Magic).
+Appearance: Young magical boy prince, red and gold outfit, spiky hair, holding a magic wand.
+Action: Rudra casts a gentle magic spell with his wand, sending sparkles towards the birthday cake, then smiles and waves.
+
+Scene: Magical palace background with floating magic particles.
+Text: In the BACKGROUND, display glowing magical text: "Happy Birthday ${personName}! ✨" ${dateLine}.
+Style: 3D CGI animation, glossy, magical effects.`;
+
+    } else if (lowerName.includes('bheem')) {
+        // Chotta Bheem
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
+
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake. The person must NOT change.
+
+On the LEFT side, animate "Chotta Bheem".
+Appearance: Strong kid, orange dhoti, no shirt, wristbands, tilak on forehead.
+Action: Bheem is standing heroically, giving a big THUMBS UP and WAVING his hand to wish happy birthday. He has a confident smile.
+
+Scene: Dholakpur village setting with festive banners.
+Text: In the BACKGROUND, display large orange/gold text: "Happy Birthday ${personName}! 🏆" ${dateLine}.
+Style: 2D detailed animation, vibrant colors.`;
+
     } else {
-        // Default placeholder prompt for other cartoons (kept minimal)
-        prompt = `Create a joyful 6-second 16:9 birthday animation featuring the selected cartoon and the uploaded person. The cartoon character should CLAP HANDS enthusiastically and display a BIG BRIGHT SMILE throughout the video. Place the cartoon on the LEFT and the real person centered behind a cake; keep the person static. Add confetti, balloons, candles, and display 'Happy Birthday ${personName}!'. Duration 6s.`;
+        // Default
+        prompt = `Create a joyful 5-second 16:9 birthday animation featuring the selected cartoon and the uploaded person.
+Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake.
+On the LEFT side, animate the cartoon character CLAPPING HANDS and celebrating.
+Text: In the BACKGROUND, display large text: "Happy Birthday ${personName}!" ${dateLine}.`;
     }
 
     // If a cartoon image is provided, create a composite (cartoon + person) so proxy receives a single image.
@@ -232,7 +306,7 @@ Style: blend soft cel-shaded Doraemon animation with a real-photo cutout; Doraem
         }
     }
 
-    const response = await generateVideoFromImage(targetImageBase64, prompt, 6);
+    const response = await generateVideoFromImage(targetImageBase64, prompt, 5);
 
     if (!response.id) {
         throw new Error('No video ID returned from API');
