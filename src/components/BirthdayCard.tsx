@@ -108,8 +108,7 @@ export function BirthdayCard({ kid, isActive = true, index = 0 }: BirthdayCardPr
             muted
             playsInline
             preload="auto"
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
 
           {/* Name and Date Overlay */}
