@@ -102,21 +102,12 @@ export function SubmissionForm({ onSuccess }: SubmissionFormProps) {
       try {
         // Get cartoon name for prompt
         const cartoonNames: { [key: string]: string } = {
-          'mottu-patlu': 'Motu Patlu',
-          'little-krishna': 'Little Krishna',
-          'doremon': 'Doraemon',
-          'shinchan': 'Shinchan',
-          'rudra': 'Rudra',
-          'chotta-bheem': 'Chotta Bheem',
-          'character_guitar': 'Rock Star Buddy',
-          'character_friendly': 'Party Pal'
+          'character_guitar': 'Pinaki',
+          'character_friendly': 'Rudra'
         };
 
         // Map cartoon IDs to their image paths
         const cartoonImagePaths: { [key: string]: string } = {
-          'mottu-patlu': '/cartoons/motu.png',
-          'doremon': '/cartoons/doremon.png',
-          'rudra': '/cartoons/rudraa.png',
           'character_guitar': '/cartoons/character_guitar.png',
           'character_friendly': '/cartoons/character_friendly.png'
         };
@@ -333,14 +324,8 @@ export function SubmissionForm({ onSuccess }: SubmissionFormProps) {
             <SelectValue placeholder="Select a cartoon character" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="mottu-patlu">Mottu Patlu</SelectItem>
-            <SelectItem value="little-krishna">Little Krishna</SelectItem>
-            <SelectItem value="doremon">Doremon</SelectItem>
-            <SelectItem value="shinchan">Shinchan</SelectItem>
-            <SelectItem value="rudra">Rudra</SelectItem>
-            <SelectItem value="chotta-bheem">Chotta Bheem</SelectItem>
-            <SelectItem value="character_guitar">Rock Star Buddy 🎸</SelectItem>
-            <SelectItem value="character_friendly">Party Pal 🎉</SelectItem>
+            <SelectItem value="character_guitar">Pinaki</SelectItem>
+            <SelectItem value="character_friendly">Rudra</SelectItem>
           </SelectContent>
         </Select>
         {errors.cartoonFriend && (
