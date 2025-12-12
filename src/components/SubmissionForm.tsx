@@ -71,7 +71,29 @@ export function SubmissionForm({ onSuccess }: SubmissionFormProps) {
     let generatedVideoUrl: string | null = null;
 
     try {
-      // Step 1: Generate AI video with cartoon character
+      // Step 1: Remove background from person photo
+      toast.info("Removing background... 🎨", {
+        description: "Preparing your photo",
+      });
+
+      let processedPersonPhoto = photoPreview;
+      try {
+        const { removeImageBackgroundWithProgress } = await import('@/utils/removeBackground');
+        processedPersonPhoto = await removeImageBackgroundWithProgress(
+          photoPreview,
+          (progress) => {
+            // Show background removal progress (0-100)
+            console.log(`Background removal progress: ${progress}%`);
+          }
+        );
+        console.log('✅ Background removed from person photo');
+        toast.success("Background removed! ✨");
+      } catch (bgError) {
+        console.warn('Failed to remove background, using original photo:', bgError);
+        toast.warning("Using original photo (background removal failed)");
+      }
+
+      // Step 2: Generate AI video with cartoon character
       setIsGeneratingVideo(true);
       toast.info("Generating birthday video... ✨", {
         description: "This may take 30-60 seconds",
@@ -85,18 +107,67 @@ export function SubmissionForm({ onSuccess }: SubmissionFormProps) {
           'doremon': 'Doraemon',
           'shinchan': 'Shinchan',
           'rudra': 'Rudra',
-          'chotta-bheem': 'Chotta Bheem'
+          'chotta-bheem': 'Chotta Bheem',
+          'character_guitar': 'Rock Star Buddy',
+          'character_friendly': 'Party Pal'
+        };
+
+        // Map cartoon IDs to their image paths
+        const cartoonImagePaths: { [key: string]: string } = {
+          'mottu-patlu': '/cartoons/motu.png',
+          'doremon': '/cartoons/doremon.png',
+          'rudra': '/cartoons/rudraa.png',
+          'character_guitar': '/cartoons/character_guitar.png',
+          'character_friendly': '/cartoons/character_friendly.png'
         };
 
         const cartoonName = cartoonNames[selectedCartoon] || selectedCartoon;
+        const cartoonImagePath = cartoonImagePaths[selectedCartoon];
 
-        // Generate video with ONLY person photo - AI will create cartoon from prompt
+        // Load cartoon image as base64 if path exists
+        let cartoonImageBase64: string | null = null;
+        if (cartoonImagePath) {
+          try {
+            const response = await fetch(cartoonImagePath);
+            const blob = await response.blob();
+            cartoonImageBase64 = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(blob);
+            });
+            console.log('✅ Loaded cartoon image:', cartoonImagePath);
+
+            // Apply background removal to cartoon image
+            toast.info("Removing cartoon background... 🎨", {
+              description: "Preparing cartoon character",
+            });
+
+            try {
+              const { removeImageBackgroundWithProgress } = await import('@/utils/removeBackground');
+              cartoonImageBase64 = await removeImageBackgroundWithProgress(
+                cartoonImageBase64,
+                (progress) => {
+                  console.log(`Cartoon background removal progress: ${progress}%`);
+                }
+              );
+              console.log('✅ Background removed from cartoon image');
+              toast.success("Cartoon background removed! ✨");
+            } catch (bgError) {
+              console.warn('Failed to remove cartoon background, using original:', bgError);
+              toast.warning("Using original cartoon (background removal failed)");
+            }
+          } catch (err) {
+            console.warn('Failed to load cartoon image, will use prompt only:', err);
+          }
+        }
+
+        // Generate video with processed person photo (background removed) + cartoon image
         generatedVideoUrl = await generateBirthdayVideoWithCartoon(
-          photoPreview,
-          null, // No cartoon image - AI generates from prompt
+          processedPersonPhoto, // Use background-removed photo
+          cartoonImageBase64, // Pass cartoon image for compositing
           data.kidName,
           cartoonName,
-          data.dateOfBirth, // include date text to show in video
+          null, // Don't show date in video
           (progress) => setVideoProgress(progress)
         );
 
@@ -268,6 +339,8 @@ export function SubmissionForm({ onSuccess }: SubmissionFormProps) {
             <SelectItem value="shinchan">Shinchan</SelectItem>
             <SelectItem value="rudra">Rudra</SelectItem>
             <SelectItem value="chotta-bheem">Chotta Bheem</SelectItem>
+            <SelectItem value="character_guitar">Rock Star Buddy 🎸</SelectItem>
+            <SelectItem value="character_friendly">Party Pal 🎉</SelectItem>
           </SelectContent>
         </Select>
         {errors.cartoonFriend && (

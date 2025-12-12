@@ -199,15 +199,13 @@ export async function generateBirthdayVideoWithCartoon(
 
     // Conditional Prompts based on Character
 
-    const dateLine = dateText ? ` and include a smaller caption showing the date: "${dateText}"` : '';
-
     const lowerName = cartoonName.toLowerCase();
 
     if (lowerName.includes('doremon') || lowerName.includes('doraemon')) {
         // Doraemon
         prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
 
-Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake (lit candles). The person must NOT change.
+The uploaded person should be animated and celebrating! They should be SMILING, WAVING, and CLAPPING joyfully. Make them look happy and excited.
 
 On the LEFT side, animate "Doraemon" (Blue robotic cat).
 Appearance: Classic blue body, white belly, red nose, red collar with bell. He should look happy and excited.
@@ -215,7 +213,7 @@ Action: Doraemon is JUMPING with joy, CLAPPING his hands, and WAVING energetical
 
 Scene: Bright, colorful party background with balloons, falling confetti, and streamers.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, HIGHLY VISIBLE text on the wall/background that reads: "Happy Birthday ${personName}!" The text MUST be clearly readable, use bright contrasting colors (rainbow gradient or gold), and be positioned prominently in the upper portion of the background. ${dateLine ? `Also include smaller text showing: "${dateText}"` : ''}
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, HIGHLY VISIBLE text on the wall/background that reads: "Happy Birthday ${personName}!" The text MUST be clearly readable, use bright contrasting colors (rainbow gradient or gold), and be positioned prominently in the upper portion of the background.
 
 Style: Blend soft cel-shaded animation with real-photo cutout. 24fps.`;
 
@@ -231,7 +229,7 @@ Action: Krishna is DANCING joyfully, playing his flute briefly, then stopping to
 
 Scene: Divine Vrindavan garden party with soft glowing lights and sparkles.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, GLOWING, MAGICAL text floating in the sky/background that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with divine golden glow effect, large font size, and positioned prominently above or behind the characters. ${dateLine ? `Also include smaller glowing text: "${dateText}"` : ''}
+CRITICAL TEXT REQUIREMENT: Display LARGE, GLOWING, MAGICAL text floating in the sky/background that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with divine golden glow effect, large font size, and positioned prominently above or behind the characters.
 
 Style: High-quality 3D animated style, divine atmosphere.`;
 
@@ -247,7 +245,7 @@ Action: Both Motu and Patlu are DANCING joyfully and CLAPPING their hands to cel
 
 Scene: Vibrant town market background (Furfuri Nagar style) with party decorations.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text on a banner or wall in the background that reads: "Happy Birthday ${personName}!" The text MUST be clearly readable, use vibrant multi-colored letters, large font, and be prominently visible in the scene. ${dateLine ? `Include smaller text banner: "${dateText}"` : ''}
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text on a banner or wall in the background that reads: "Happy Birthday ${personName}!" The text MUST be clearly readable, use vibrant multi-colored letters, large font, and be prominently visible in the scene.
 
 Style: High-quality 3D animation (CGI), bright colors.`;
 
@@ -263,7 +261,7 @@ Action: Shinchan is JUMPING excitedly and doing his signature "Action Kamen" pos
 
 Scene: Colorful living room or park background with crayons/doodles style.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, CARTOON-STYLE text written on the wall/background that reads: "Happy Birthday ${personName}!" The text MUST be in thick black outline with bright fill colors, very large and clearly visible, positioned prominently on the wall behind the scene. ${dateLine ? `Add smaller cartoon text: "${dateText}"` : ''}
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, CARTOON-STYLE text written on the wall/background that reads: "Happy Birthday ${personName}!" The text MUST be in thick black outline with bright fill colors, very large and clearly visible, positioned prominently on the wall behind the scene.
 
 Style: 2D Anime style, flat colors, thick outlines.`;
 
@@ -279,7 +277,7 @@ Action: Rudra casts a gentle magic spell with his wand, sending sparkles towards
 
 Scene: Magical palace background with floating magic particles.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, GLOWING, MAGICAL text floating in the air that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with bright magical glow, sparkle effects, large size, and positioned prominently in the upper background. ${dateLine ? `Include smaller magical text: "${dateText}"` : ''}
+CRITICAL TEXT REQUIREMENT: Display LARGE, GLOWING, MAGICAL text floating in the air that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with bright magical glow, sparkle effects, large size, and positioned prominently in the upper background.
 
 Style: 3D CGI animation, glossy, magical effects.`;
 
@@ -295,9 +293,59 @@ Action: Bheem is standing heroically, giving a big THUMBS UP and WAVING his hand
 
 Scene: Dholakpur village setting with festive banners.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD text on a festive banner in the background that reads: "Happy Birthday ${personName}!" The text MUST be in bright orange/gold colors, very large font, clearly readable, and prominently displayed on banners or walls in the village scene. ${dateLine ? `Add smaller banner text: "${dateText}"` : ''}
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD text on a festive banner in the background that reads: "Happy Birthday ${personName}!" The text MUST be in bright orange/gold colors, very large font, clearly readable, and prominently displayed on banners or walls in the village scene.
 
 Style: 2D detailed animation, vibrant colors.`;
+
+    } else if (lowerName.includes('rock star') || lowerName.includes('guitar')) {
+        // Rock Star Buddy (Guitar Player Character)
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
+
+LAYOUT (Left to Right):
+- LEFT: Animated "Rock Star Character" (Orange outfit, holding guitar)
+- CENTER: Large festive birthday cake with lit candles
+- RIGHT: The birthday person celebrating
+
+Rock Star Character:
+Appearance: Energetic character in orange outfit with guitar, excited expression, dynamic pose, spiky hair.
+Action: Character is JUMPING with joy, PLAYING AIR GUITAR energetically, HEADBANGING to celebrate, and WAVING enthusiastically toward the birthday person. Full of energy and excitement!
+
+Birthday Cake:
+Place a LARGE, FESTIVE birthday cake with LIT CANDLES in the CENTER between the character and person. The cake should be prominent and clearly visible.
+
+Birthday Person:
+The uploaded person should be on the RIGHT side, ANIMATED and celebrating! They should be DANCING, JUMPING with excitement, CLAPPING their hands, and SINGING ALONG. Make them look thrilled and full of energy, celebrating with the rock star!
+
+Scene: Vibrant colorful background with dynamic wave patterns in cyan, magenta, yellow, and purple (sonic waves style). Stage lights with colorful beams, balloons floating, confetti falling. Rock concert party atmosphere with neon glow effects.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, NEON-STYLE text that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with bright neon glow effect (pink/cyan gradient), very large font size, and positioned prominently in the upper background with glowing edges.
+
+Style: High-quality 3D animated style, energetic rock concert atmosphere, dynamic lighting, vibrant neon colors.`;
+
+    } else if (lowerName.includes('party pal') || lowerName.includes('friendly')) {
+        // Party Pal (Friendly Character)
+        prompt = `Create a high-quality 5-second MP4 16:9 birthday celebration animation.
+
+LAYOUT (Left to Right):
+- LEFT: Animated "Party Pal Character" (Blue and yellow outfit)
+- CENTER: Large festive birthday cake with lit candles
+- RIGHT: The birthday person celebrating
+
+Party Pal Character:
+Appearance: Friendly character in blue jacket and yellow shirt, cheerful smiling expression, welcoming pose.
+Action: Character is WAVING enthusiastically with both hands, JUMPING with excitement, CLAPPING hands together, and DANCING joyfully to celebrate. Very happy and energetic!
+
+Birthday Cake:
+Place a LARGE, FESTIVE birthday cake with LIT CANDLES in the CENTER between the character and person. The cake should be prominent and clearly visible.
+
+Birthday Person:
+The uploaded person should be on the RIGHT side, ANIMATED and celebrating! They should be DANCING joyfully, JUMPING with happiness, WAVING their hands, and LAUGHING with pure joy. Make them look ecstatic and full of life, celebrating together with the Party Pal!
+
+Scene: Colorful party room with dynamic wave pattern background in cyan, magenta, yellow, and purple (sonic waves style). Balloons everywhere, colorful streamers hanging, confetti falling continuously. Festive birthday party atmosphere with bright cheerful lighting.
+
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible with rainbow gradient colors (pink to yellow to cyan), very large font size, and positioned prominently in the upper background.
+
+Style: High-quality 3D animated style, cheerful party atmosphere, vibrant rainbow colors, friendly and welcoming mood.`;
 
     } else {
         // Default
@@ -305,7 +353,7 @@ Style: 2D detailed animation, vibrant colors.`;
 Use the uploaded real person photo as a static photo-cutout centered behind a festive birthday cake.
 On the LEFT side, animate the cartoon character CLAPPING HANDS and celebrating.
 
-CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text in the background that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible, use bright contrasting colors, large font size, and be prominently positioned in the upper background. ${dateLine ? `Include smaller text: "${dateText}"` : ''}`;
+CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text in the background that reads: "Happy Birthday ${personName}!" The text MUST be clearly visible, use bright contrasting colors, large font size, and be prominently positioned in the upper background.`;
     }
 
     // If a cartoon image is provided, create a composite (cartoon + person) so proxy receives a single image.
@@ -320,14 +368,8 @@ CRITICAL TEXT REQUIREMENT: Display LARGE, BOLD, COLORFUL text in the background 
         }
     }
 
-    // Add "Happy Birthday" text overlay to ensure it appears in the video
-    // AI models are unreliable at generating text from prompts, so we add it directly to the image
-    try {
-        targetImageBase64 = await addTextToImage(targetImageBase64, personName, dateText);
-        console.log('✅ Added birthday text overlay to image');
-    } catch (err) {
-        console.warn('Failed to add text overlay, proceeding without it', err);
-    }
+    // Let AI generate "Happy Birthday" text in the video naturally
+    // (Text overlay removed to avoid card-like appearance)
 
     const response = await generateVideoFromImage(targetImageBase64, prompt, 5);
 

@@ -72,27 +72,6 @@ export async function addTextToImage(
                 ctx.lineWidth = 3;
                 ctx.strokeText(birthdayText, x, y);
 
-                // Add date text if provided
-                if (dateText) {
-                    const dateFontSize = Math.floor(fontSize * 0.5);
-                    ctx.font = `${dateFontSize}px Arial, sans-serif`;
-                    const dateY = y + textHeight + 10;
-
-                    // Semi-transparent background for date
-                    const dateMetrics = ctx.measureText(dateText);
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-                    ctx.fillRect(
-                        x - dateMetrics.width / 2 - 15,
-                        dateY - 5,
-                        dateMetrics.width + 30,
-                        dateFontSize + 10
-                    );
-
-                    // Date text
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillText(dateText, x, dateY);
-                }
-
                 // Convert to base64
                 resolve(canvas.toDataURL('image/jpeg', 0.95));
             } catch (error) {

@@ -1,22 +1,24 @@
 /**
- * Combine two images side-by-side into a single composite image
+ * Combine two images into a beautiful composite for birthday videos
+ * Creates a 16:9 canvas with vibrant gradient background
  */
 export async function createCompositeImage(
-    image1Base64: string,
-    image2Base64: string,
+    cartoonBase64: string,
+    personBase64: string,
     maxWidth = 1920,
     maxHeight = 1080
 ): Promise<string> {
     return new Promise((resolve, reject) => {
-        const img1 = new Image();
-        const img2 = new Image();
+        const cartoonImg = new Image();
+        const personImg = new Image();
+        const bgImg = new Image();
         let loadedCount = 0;
 
         const onImageLoad = () => {
             loadedCount++;
-            if (loadedCount === 2) {
+            if (loadedCount === 3) { // Wait for all 3 images
                 try {
-                    // Create canvas
+                    // Create 16:9 canvas
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     if (!ctx) {
@@ -24,51 +26,124 @@ export async function createCompositeImage(
                         return;
                     }
 
-                    // Calculate dimensions - place images side by side
-                    const totalWidth = img1.width + img2.width;
-                    const maxHeightImg = Math.max(img1.height, img2.height);
+                    // Set 16:9 aspect ratio
+                    canvas.width = 1920;
+                    canvas.height = 1080;
 
-                    // Scale down if needed
-                    let scale = 1;
-                    if (totalWidth > maxWidth || maxHeightImg > maxHeight) {
-                        scale = Math.min(maxWidth / totalWidth, maxHeight / maxHeightImg);
+                    // Draw the sonic waves background image to fill the entire canvas
+                    // If bgImg failed to load (width will be 0), use gradient fallback
+                    if (bgImg.width > 0) {
+                        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                    } else {
+                        // Gradient fallback if background image failed to load
+                        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                        gradient.addColorStop(0, '#FF6B9D');    // Pink
+                        gradient.addColorStop(0.25, '#C44569'); // Deep pink
+                        gradient.addColorStop(0.5, '#FFA07A');  // Light coral
+                        gradient.addColorStop(0.75, '#FFD700'); // Gold
+                        gradient.addColorStop(1, '#FF1493');    // Deep pink
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
                     }
 
-                    canvas.width = totalWidth * scale;
-                    canvas.height = maxHeightImg * scale;
+                    // Calculate sizes for images (make them larger and centered)
+                    const maxImgHeight = canvas.height * 0.8; // Use 80% of canvas height
+                    const spacing = 100; // Space between images
 
-                    // Fill with white background
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    // Scale cartoon to fit
+                    let cartoonScale = maxImgHeight / cartoonImg.height;
+                    let cartoonWidth = cartoonImg.width * cartoonScale;
+                    let cartoonHeight = cartoonImg.height * cartoonScale;
 
-                    // Draw first image (person) on left
-                    const img1Width = img1.width * scale;
-                    const img1Height = img1.height * scale;
-                    const img1Y = (canvas.height - img1Height) / 2; // Center vertically
-                    ctx.drawImage(img1, 0, img1Y, img1Width, img1Height);
+                    // Scale person to fit
+                    let personScale = maxImgHeight / personImg.height;
+                    let personWidth = personImg.width * personScale;
+                    let personHeight = personImg.height * personScale;
 
-                    // Draw second image (cartoon) on right
-                    const img2Width = img2.width * scale;
-                    const img2Height = img2.height * scale;
-                    const img2X = img1Width;
-                    const img2Y = (canvas.height - img2Height) / 2; // Center vertically
-                    ctx.drawImage(img2, img2X, img2Y, img2Width, img2Height);
+                    // Calculate positions (centered with spacing)
+                    const totalWidth = cartoonWidth + personWidth + spacing;
+                    const startX = (canvas.width - totalWidth) / 2;
+
+                    const cartoonX = startX;
+                    const cartoonY = (canvas.height - cartoonHeight) / 2;
+
+                    const personX = startX + cartoonWidth + spacing;
+                    const personY = (canvas.height - personHeight) / 2;
+
+                    // Draw cartoon character with shadow
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowOffsetX = 10;
+                    ctx.shadowOffsetY = 10;
+
+                    // Draw rounded rectangle for cartoon
+                    ctx.save();
+                    ctx.beginPath();
+                    const radius = 20;
+                    ctx.moveTo(cartoonX + radius, cartoonY);
+                    ctx.lineTo(cartoonX + cartoonWidth - radius, cartoonY);
+                    ctx.quadraticCurveTo(cartoonX + cartoonWidth, cartoonY, cartoonX + cartoonWidth, cartoonY + radius);
+                    ctx.lineTo(cartoonX + cartoonWidth, cartoonY + cartoonHeight - radius);
+                    ctx.quadraticCurveTo(cartoonX + cartoonWidth, cartoonY + cartoonHeight, cartoonX + cartoonWidth - radius, cartoonY + cartoonHeight);
+                    ctx.lineTo(cartoonX + radius, cartoonY + cartoonHeight);
+                    ctx.quadraticCurveTo(cartoonX, cartoonY + cartoonHeight, cartoonX, cartoonY + cartoonHeight - radius);
+                    ctx.lineTo(cartoonX, cartoonY + radius);
+                    ctx.quadraticCurveTo(cartoonX, cartoonY, cartoonX + radius, cartoonY);
+                    ctx.closePath();
+                    ctx.clip();
+
+                    // Draw the character image directly (preserve transparency)
+                    ctx.drawImage(cartoonImg, cartoonX, cartoonY, cartoonWidth, cartoonHeight);
+                    ctx.restore();
+
+                    // Draw person photo with shadow (preserve transparency from background removal)
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(personX + radius, personY);
+                    ctx.lineTo(personX + personWidth - radius, personY);
+                    ctx.quadraticCurveTo(personX + personWidth, personY, personX + personWidth, personY + radius);
+                    ctx.lineTo(personX + personWidth, personY + personHeight - radius);
+                    ctx.quadraticCurveTo(personX + personWidth, personY + personHeight, personX + personWidth - radius, personY + personHeight);
+                    ctx.lineTo(personX + radius, personY + personHeight);
+                    ctx.quadraticCurveTo(personX, personY + personHeight, personX, personY + personHeight - radius);
+                    ctx.lineTo(personX, personY + radius);
+                    ctx.quadraticCurveTo(personX, personY, personX + radius, personY);
+                    ctx.closePath();
+                    ctx.clip();
+
+                    // Draw the person image directly (no white background fill to preserve transparency)
+                    ctx.drawImage(personImg, personX, personY, personWidth, personHeight);
+                    ctx.restore();
+
+                    // Reset shadow
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
 
                     // Convert to base64
-                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                    resolve(canvas.toDataURL('image/jpeg', 0.95));
                 } catch (error) {
                     reject(error);
                 }
             }
         };
 
-        img1.onload = onImageLoad;
-        img2.onload = onImageLoad;
-        img1.onerror = () => reject(new Error('Failed to load first image'));
-        img2.onerror = () => reject(new Error('Failed to load second image'));
+        cartoonImg.onload = onImageLoad;
+        personImg.onload = onImageLoad;
+        bgImg.onload = onImageLoad;
 
-        img1.src = image1Base64;
-        img2.src = image2Base64;
+        cartoonImg.onerror = () => reject(new Error('Failed to load cartoon image'));
+        personImg.onerror = () => reject(new Error('Failed to load person image'));
+        bgImg.onerror = () => {
+            console.warn('Failed to load sonic waves background, using gradient fallback');
+            // If background fails, still proceed with gradient fallback
+            loadedCount++; // Count as loaded to proceed
+        };
+
+        cartoonImg.src = cartoonBase64;
+        personImg.src = personBase64;
+        bgImg.src = '/backgrounds/bg-sonic-waves.png';
     });
 }
 
